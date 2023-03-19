@@ -25,6 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <math.h>
 #ifndef ARDUINO
 #include <cstdio>
+#include <cstdlib>
 #endif
 #include "NMEA0183Msg.h"
 
@@ -49,6 +50,15 @@ extern void delay(uint32_t ms);
 
 // Current uptime in milliseconds. Must be implemented by application.
 extern uint32_t millis();
+}
+
+static char* dtostrf(double val, signed char width, unsigned char prec, char* s)
+{
+    // TODO: cool function, but no bounds checking at all.
+    char tmp[10];
+    sprintf(tmp, "%%0%d.%uf", static_cast<int>(width), static_cast<unsigned int>(prec));
+    sprintf(s, tmp, val);
+    return s;
 }
 #endif
 
@@ -270,11 +280,11 @@ bool tNMEA0183Msg::AddDoubleField(double val, double multiplier, const char *For
   uint8_t width=1;
   bool Padding=false;
   // Try to solve requested width and precision
-  char *DotPos=strchr(Format,'.');
+  const char *DotPos=strchr(Format,'.');
   if ( DotPos!=0 ) {
-    char *PrecPos=DotPos+1;
+    const char *PrecPos=DotPos+1;
     if ( PrecPos!=0 ) precision=atoi(PrecPos);
-    char *WidthPos=DotPos;
+    const char *WidthPos=DotPos;
     while (WidthPos>Format && (*(WidthPos-1))!='%' ) WidthPos--;
     if ( WidthPos!=DotPos ) {
       width=atoi(WidthPos);

@@ -497,6 +497,8 @@ inline bool NMEA0183ParseZDA(const tNMEA0183Msg &NMEA0183Msg, tZDA &zda) {
 	return NMEA0183ParseZDA(NMEA0183Msg, zda.GPSTime, zda.GPSDay, zda.GPSMonth, zda.GPSYear, zda.LZD, zda.LZMD);
 }
 
+bool NMEA0183SetZDA(tNMEA0183Msg& NMEA0183Msg, double GPSTime, int GPSDay, int GPSMonth, int GPSYear, int LZD, int LZMD, const char* Src);
+
 //*****************************************************************************
 //$GPAPB,A,A,0.10,R,N,V,V,011,M,DEST,011,M,011,M*82
 bool NMEA0183ParseAPB_nc(const tNMEA0183Msg &NMEA0183Msg, tAPB &apb);
@@ -505,6 +507,11 @@ inline bool NMEA0183ParseAPB(const tNMEA0183Msg &NMEA0183Msg, tAPB &apb) {
     return (NMEA0183Msg.IsMessageCode("APB") ?
         NMEA0183ParseAPB_nc(NMEA0183Msg, apb) : false);
 }
+
+//*****************************************************************************
+//        UTC        Hdg    T Roll  Pitch Heave R.Acc P.Acc H.Acc Q S
+// $PASHR,163029.000,158.09,T,-0.30,+0.31,+0.01,0.029,0.029,0.059,1,1*3B
+bool NMEA0183SetSHR(tNMEA0183Msg& NMEA0183Msg, double GPSTime, const double HeadingRad, const double RollRad, const double PitchRad, double HeaveM, double RollAccuracyRad, double PitchAccuracyRad, double HeadingAccuracyRad, int GPSQualityIndicator, int INSStatusFlag, const char* Source);
 
 
 

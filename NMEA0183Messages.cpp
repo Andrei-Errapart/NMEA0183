@@ -226,8 +226,8 @@ bool NMEA0183SetDPT(tNMEA0183Msg &NMEA0183Msg, double DepthBelowTransducer, doub
 
 bool NMEA0183SetDPT(tNMEA0183Msg &NMEA0183Msg, double DepthBelowTransducer, double Offset, const char *Src) {
   if ( !NMEA0183Msg.Init("DPT",Src) ) return false;
-  if ( !NMEA0183Msg.AddDoubleField(DepthBelowTransducer) ) return false;
-  if ( !NMEA0183Msg.AddDoubleField(Offset) ) return false;
+  if ( !NMEA0183Msg.AddDoubleField(DepthBelowTransducer, 1, "%.2f")) return false;
+  if ( !NMEA0183Msg.AddDoubleField(Offset, 1, "%.2f") ) return false;
 
   return true;
 }
@@ -892,6 +892,23 @@ bool NMEA0183ParseZDA(const tNMEA0183Msg &NMEA0183Msg, time_t &DateTime, long &T
   return result;
 }
 
+bool NMEA0183SetZDA(tNMEA0183Msg& NMEA0183Msg, double GPSTime, int GPSDay, int GPSMonth, int GPSYear, int LZD, int LZMD, const char* Src)
+{
+    char tmp[10];
+    if (!NMEA0183Msg.Init("ZDA", Src)) return false;
+    if (!NMEA0183Msg.AddTimeField(GPSTime)) return false;
+    sprintf(tmp, "%02d", GPSDay);
+    if (!NMEA0183Msg.AddStrField(tmp)) return false;
+    sprintf(tmp, "%02d", GPSMonth);
+    if (!NMEA0183Msg.AddStrField(tmp)) return false;
+    if (!NMEA0183Msg.AddUInt32Field(GPSYear)) return false;
+    sprintf(tmp, "%02d", LZD);
+    if (!NMEA0183Msg.AddStrField(tmp)) return false;
+    sprintf(tmp, "%02d", LZMD);
+    if (!NMEA0183Msg.AddStrField(tmp)) return false;
+    return true;
+}
+
 //*****************************************************************************
 bool NMEA0183ParseAPB_nc(const tNMEA0183Msg &NMEA0183Msg, tAPB &APB) {
 
@@ -926,4 +943,27 @@ bool NMEA0183ParseAPB_nc(const tNMEA0183Msg &NMEA0183Msg, tAPB &APB) {
 
   return result;
 
+}
+
+//*****************************************************************************
+static bool AddDoubleFieldWithSign(tNMEA0183Msg& NMEA0183Msg, const double v)
+{
+    return NMEA0183Msg.AddDoubleField(v, 1, (v>=0 ? "+%.2f" : "%.2f"));
+}
+
+bool NMEA0183SetSHR(tNMEA0183Msg& NMEA0183Msg, double GPSTime, const double HeadingRad, const double RollRad, const double PitchRad, double HeaveM, double RollAccuracyRad, double PitchAccuracyRad, double HeadingAccuracyRad, int GPSQualityIndicator, int INSStatusFlag, const char* Source)
+{
+  if (!NMEA0183Msg.Init("SHR", Source)) return false;
+  if (!NMEA0183Msg.AddTimeField(GPSTime)) return false;
+  if (!NMEA0183Msg.AddDoubleField(radToDeg * HeadingRad)) return false;
+  if (!NMEA0183Msg.AddStrField("T")) return false;
+  if (!AddDoubleFieldWithSign(NMEA0183Msg, radToDeg * RollRad)) return false;
+  if (!AddDoubleFieldWithSign(NMEA0183Msg, radToDeg * PitchRad)) return false;
+  if (!AddDoubleFieldWithSign(NMEA0183Msg, HeaveM)) return false;
+  if (!NMEA0183Msg.AddDoubleField(radToDeg * RollAccuracyRad, 1, "%.2f")) return false;
+  if (!NMEA0183Msg.AddDoubleField(radToDeg * PitchAccuracyRad, 1, "%.2f")) return false;
+  if (!NMEA0183Msg.AddDoubleField(radToDeg * HeadingAccuracyRad, 1, "%.2f")) return false;
+  if (!NMEA0183Msg.AddUInt32Field(GPSQualityIndicator)) return false;
+  if (!NMEA0183Msg.AddUInt32Field(INSStatusFlag)) return false;
+  return true;
 }

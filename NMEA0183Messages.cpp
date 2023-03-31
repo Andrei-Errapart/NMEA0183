@@ -264,8 +264,8 @@ bool NMEA0183SetGGA(tNMEA0183Msg &NMEA0183Msg, double GPSTime, double Latitude, 
 
   if ( !NMEA0183Msg.Init("GGA",Src) ) return false;
   if ( !NMEA0183Msg.AddTimeField(GPSTime) ) return false;
-  if ( !NMEA0183Msg.AddLatitudeField(Latitude) ) return false;
-  if ( !NMEA0183Msg.AddLongitudeField(Longitude) ) return false;
+  if ( !NMEA0183Msg.AddLatitudeField(Latitude,"%.6f") ) return false;
+  if ( !NMEA0183Msg.AddLongitudeField(Longitude,"%.6f") ) return false;
   if ( !NMEA0183Msg.AddUInt32Field(GPSQualityIndicator) ) return false;
   if ( !NMEA0183Msg.AddUInt32Field(SatelliteCount) ) return false;
   if ( !NMEA0183Msg.AddDoubleField(HDOP) ) return false;
